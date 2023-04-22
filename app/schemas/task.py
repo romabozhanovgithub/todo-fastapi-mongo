@@ -6,15 +6,15 @@ from app.schemas import PyObjectId
 
 schema_extra = {
     "example": {
-        "title": "Todo 1",
-        "description": "Todo 1 description",
+        "title": "Task 1",
+        "description": "Task 1 description",
         "status": False,
         "created_at": "2021-01-01 00:00:00"
     }
 }
 
 
-class TodoConfig:
+class TaskConfig:
     allow_population_by_field_name = True
     arbitrary_types_allowed = True
     json_encoders = {
@@ -22,22 +22,22 @@ class TodoConfig:
     }
 
 
-class TodoBaseSchema(BaseModel):
+class TaskBaseSchema(BaseModel):
     title: str = Field(...)
     description: str = Field(...)
     status: bool = Field(...)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
-class TodoRequestSchema(TodoBaseSchema):
-    class Config(TodoConfig):
+class TaskRequestSchema(TaskBaseSchema):
+    class Config(TaskConfig):
         schema_extra = schema_extra
 
 
-class TodoResponseSchema(TodoBaseSchema):
+class TaskResponseSchema(TaskBaseSchema):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     
-    class Config(TodoConfig):
+    class Config(TaskConfig):
         schema_extra = schema_extra.update(
             {
                 "example": {
