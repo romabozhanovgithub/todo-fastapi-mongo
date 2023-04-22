@@ -1,1 +1,1 @@
-from app.db import client  # noqa: F401
+from app.db.client import client  # noqa: F401
