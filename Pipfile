@@ -11,6 +11,9 @@ mypy = "*"
 pydantic = "*"
 python-dotenv = "*"
 pytest = "*"
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+motor = "*"
 
 [dev-packages]
 
