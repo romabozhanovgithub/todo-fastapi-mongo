@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     APP_TITLE: str = "TODO API"
     DB_HOST: str
     DB_PORT: int
+    DB_NAME: str
 
 
 settings = Settings()
