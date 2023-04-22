@@ -8,6 +8,8 @@ black = "*"
 flake8 = "*"
 bandit = "*"
 mypy = "*"
+pydantic = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
