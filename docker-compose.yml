@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   mongo:
-    image: mongo
-    container_name: mongo
+    image: mongo:latest
+    container_name: tasks
     restart: always
     ports:
       - 27017:27017
@@ -12,15 +12,17 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: tasks
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      target: ${TARGET:-dev}
     ports:
       - 5000:5000
     environment:
-      - env_file: ./system_configs/.env
+      env_file: ./system_configs/.env
     volumes:
       - ./:/app
     depends_on:
