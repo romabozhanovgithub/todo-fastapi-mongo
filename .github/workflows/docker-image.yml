@@ -18,6 +18,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install --no-cache pipenv
+        pipenv install --system --deploy --dev
         make deploy
         docker build . --file Dockerfile --tag my-image-name:$(date +%s)
       env:
