@@ -16,6 +16,7 @@ uvicorn = {extras = ["standard"], version = "*"}
 motor = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
+python-multipart = "*"
 
 [dev-packages]
 
