@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any, Optional, Union
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from fastapi import status
 from fastapi.exceptions import HTTPException
 
 from app.core import settings
@@ -16,12 +17,16 @@ class AuthService:
     def __init__(self, user_service: UserService) -> None:
         self.user_service = user_service
 
-    def verify_password(self, plain_password, hashed_password) -> bool:
+    def verify_password(self, plain_password, hashed_password) -> None:
         """
         Verify a plain password against a hashed password.
         """
 
-        return pwd_context.verify(plain_password, hashed_password)
+        if not pwd_context.verify(plain_password, hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
 
     def get_password_hash(self, password) -> str:
         """
@@ -62,7 +67,7 @@ class AuthService:
         )
         return encoded_jwt
 
-    def decode_token(self, token: str) -> str:
+    def decode_token(self, token: str) -> dict[str, str]:
         """
         Decode token.
         """
@@ -71,7 +76,7 @@ class AuthService:
             token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         return decoded_token
-    
+
     async def get_current_user(self, token: str) -> UserDBSchema:
         """
         Get current user.
@@ -79,7 +84,7 @@ class AuthService:
 
         try:
             payload = self.decode_token(token)
-            email: str = payload.get("sub")
+            email: Optional[str] = payload.get("sub")
             if email is None:
                 raise HTTPException(
                     status_code=401, detail="Could not validate credentials"
@@ -92,7 +97,7 @@ class AuthService:
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         return user
-    
+
     async def get_current_active_user(self, token: str) -> UserDBSchema:
         """
         Get current active user.
@@ -105,7 +110,7 @@ class AuthService:
 
     async def authenticate_user(
         self, email: str, password: str
-    ) -> UserResponseSchema | bool:
+    ) -> UserResponseSchema:
         """
         Authenticate user.
         """
@@ -113,9 +118,11 @@ class AuthService:
         try:
             user = await self.user_service.get_user_by_email(email)
         except self.user_service.not_found_exception:
-            return False
-        if not self.verify_password(password, user.password):
-            return False
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
+        self.verify_password(password, user.password)
         return UserResponseSchema(**user.dict())
 
     async def sign_up_user(

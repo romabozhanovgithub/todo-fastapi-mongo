@@ -43,11 +43,14 @@ class BaseService:
 
     async def find_document_by_id(self, id: str, filter: dict = {}) -> dict:
         """
-        This method is used to find a document by id. Additional filters can be passed.
+        This method is used to find a document by id.
+        Additional filters can be passed.
         Raises an exception if the document is not found.
         """
 
-        document = await self.collection.find_one({"_id": self._get_id(id), **filter})
+        document = await self.collection.find_one(
+            {"_id": self._get_id(id), **filter}
+        )
         if not document:
             raise self.not_found_exception(id)
         return document
@@ -63,33 +66,40 @@ class BaseService:
             raise self.not_found_exception(value)
         return document
 
-    async def find_documents(self, filter: dict = {}, limit: int = 100) -> list[dict]:
+    async def find_documents(
+        self, filter: dict = {}, limit: int = 100
+    ) -> list[dict]:
         """
         This method is used to find all documents.
         """
 
         documents = await self.collection.find(filter).to_list(length=limit)
         return documents
-        
 
     async def find_and_update_document_by_id(
         self, id: str, update: dict, filter: dict = {}
     ) -> dict:
         """
-        This method is used to update a document and return it. Additional filters can be passed.
+        This method is used to update a document and return it.
+        Additional filters can be passed.
         Raises an exception if the document is not found.
         """
 
         document = await self.collection.find_one_and_update(
-            {"_id": self._get_id(id), **filter}, {"$set": update}, return_document=True
+            {"_id": self._get_id(id), **filter},
+            {"$set": update},
+            return_document=True,
         )
         if not document:
             raise self.not_found_exception(id)
         return document
 
-    async def find_and_delete_document_by_id(self, id: str, filter: dict = {}) -> dict:
+    async def find_and_delete_document_by_id(
+        self, id: str, filter: dict = {}
+    ) -> dict:
         """
-        This method is used to delete a document and return it. Additional filters can be passed.
+        This method is used to delete a document and return it.
+        Additional filters can be passed.
         Raises an exception if the document is not found.
         """
 

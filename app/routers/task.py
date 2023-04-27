@@ -11,7 +11,9 @@ from app.schemas import (
 )
 from app.core.dependencies import get_request_user, get_task_service
 
-router = APIRouter(prefix="/tasks", tags=["tasks"], dependencies=[Depends(get_request_user)])
+router = APIRouter(
+    prefix="/tasks", tags=["tasks"], dependencies=[Depends(get_request_user)]
+)
 
 
 @router.get(
@@ -55,10 +57,9 @@ async def create_task(
     task_service: TaskService = Depends(get_task_service),
     user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskResponseSchema:
-    new_task = await task_service.create_task({
-        **task.dict(),
-        "user_id": user.id
-    })
+    new_task = await task_service.create_task(
+        {**task.dict(), "user_id": user.id}
+    )
     return new_task
 
 
@@ -73,8 +74,11 @@ async def update_task(
     task_id: str,
     task: TaskRequestSchema,
     task_service: TaskService = Depends(get_task_service),
+    user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskResponseSchema:
-    updated_task = await task_service.update_task_by_id_and_user(task_id, task)
+    updated_task = await task_service.update_task_by_id_and_user(
+        task_id, task, user.id
+    )
     return updated_task
 
 
@@ -88,8 +92,9 @@ async def update_task(
 async def delete_task(
     task_id: str,
     task_service: TaskService = Depends(get_task_service),
+    user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskDeleteResponseSchema:
-    task = await task_service.delete_task(task_id)
+    task = await task_service.delete_task_by_id_and_user(task_id, user.id)
     return TaskDeleteResponseSchema(
         message=f"Task with id {task_id} has been deleted", task=task
     )

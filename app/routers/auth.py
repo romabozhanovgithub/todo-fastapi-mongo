@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.auth import SignUpSchema
 
 from app.services import AuthService
 from app.schemas import (
-    TokenSchema,
     AccessTokenSchema,
     UserResponseSchema,
 )
@@ -24,11 +23,6 @@ async def login(
     auth_service: AuthService = Depends(get_auth_service),
 ) -> AccessTokenSchema:
     user = await auth_service.authenticate_user(login.username, login.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-        )
     token = auth_service.create_access_token(user.email)
     return AccessTokenSchema(
         access_token=token,
