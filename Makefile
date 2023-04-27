@@ -21,3 +21,4 @@ deploy:
 	python -m flake8 --max-line-length=79 --exclude=tests/ $(APP_FOLDER)
 	python -m bandit -r $(APP_FOLDER) --skip "B101" --recursive
 	python -m mypy --ignore-missing-imports $(APP_FOLDER)
+	python -m pytest tests/ -vv
