@@ -7,10 +7,11 @@ from app.schemas import (
     TaskListResponseSchema,
     TaskDeleteResponseSchema,
     TaskNotFoundResponseSchema,
+    UserDBBaseSchema,
 )
-from app.core.dependencies import get_task_service
+from app.core.dependencies import get_request_user, get_task_service
 
-router = APIRouter(prefix="/tasks", tags=["tasks"])
+router = APIRouter(prefix="/tasks", tags=["tasks"], dependencies=[Depends(get_request_user)])
 
 
 @router.get(
@@ -21,9 +22,10 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 )
 async def get_tasks(
     task_service: TaskService = Depends(get_task_service),
+    user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskListResponseSchema:
-    tasks = await task_service.get_tasks()
-    return TaskListResponseSchema(tasks=tasks)
+    tasks = await task_service.get_tasks_by_user(user.id)
+    return tasks
 
 
 @router.get(
@@ -34,9 +36,11 @@ async def get_tasks(
     responses={404: {"model": TaskNotFoundResponseSchema}},
 )
 async def get_task(
-    task_id: str, task_service: TaskService = Depends(get_task_service)
+    task_id: str,
+    task_service: TaskService = Depends(get_task_service),
+    user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskResponseSchema:
-    task = await task_service.get_task(task_id)
+    task = await task_service.get_task_by_id_and_user(task_id, user.id)
     return task
 
 
@@ -49,8 +53,12 @@ async def get_task(
 async def create_task(
     task: TaskRequestSchema,
     task_service: TaskService = Depends(get_task_service),
+    user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskResponseSchema:
-    new_task = await task_service.create_task(task)
+    new_task = await task_service.create_task({
+        **task.dict(),
+        "user_id": user.id
+    })
     return new_task
 
 
@@ -66,7 +74,7 @@ async def update_task(
     task: TaskRequestSchema,
     task_service: TaskService = Depends(get_task_service),
 ) -> TaskResponseSchema:
-    updated_task = await task_service.update_task(task_id, task)
+    updated_task = await task_service.update_task_by_id_and_user(task_id, task)
     return updated_task
 
 
@@ -81,8 +89,7 @@ async def delete_task(
     task_id: str,
     task_service: TaskService = Depends(get_task_service),
 ) -> TaskDeleteResponseSchema:
-    deleted = await task_service.delete_task(task_id)
+    task = await task_service.delete_task(task_id)
     return TaskDeleteResponseSchema(
-        message=f"Task with id {task_id} has been deleted",
-        deleted=deleted,
+        message=f"Task with id {task_id} has been deleted", task=task
     )
