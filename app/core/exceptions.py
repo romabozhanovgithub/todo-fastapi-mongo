@@ -11,3 +11,10 @@ class TaskNotFound(BaseHTTPException):
         super().__init__(
             status_code=status_code, detail=f"Task {task_id} not found"
         )
+
+
+class UserNotFound(BaseHTTPException):
+    def __init__(self, user_id: str, status_code=404) -> None:
+        super().__init__(
+            status_code=status_code, detail=f"User {user_id} not found"
+        )
