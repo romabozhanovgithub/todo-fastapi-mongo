@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.core.exceptions import UserAlreadyExists
 from app.schemas.auth import SignUpSchema
@@ -27,7 +27,6 @@ async def login(
     token = auth_service.create_access_token(user.email)
     return AccessTokenSchema(
         access_token=token,
-        token_type="bearer",
     )
 
 
