@@ -16,6 +16,7 @@ class TaskBaseSchema(BaseModel):
     description: str = Field(...)
     status: bool = Field(...)
 
+
 class TaskRequestSchema(TaskBaseSchema):
     class Config(TaskConfig):
         schema_extra = {
@@ -80,5 +81,16 @@ class TaskDeleteResponseSchema(BaseModel):
             "example": {
                 "detail": "Task deleted successfully",
                 "deleted": True,
+            }
+        }
+
+
+class TaskNotFoundResponseSchema(BaseModel):
+    detail: str = "Task not found"
+
+    class Config(TaskConfig):
+        schema_extra = {
+            "example": {
+                "detail": "Task 60c4b8b7e6a9d9f9f8f8f8f8 not found",
             }
         }
