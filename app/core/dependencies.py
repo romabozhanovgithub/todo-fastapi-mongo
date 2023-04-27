@@ -30,5 +30,5 @@ async def get_request_user(
     token: str = Depends(oauth2_scheme),
     auth_service: AuthService = Depends(get_auth_service),
 ) -> UserDBBaseSchema:
-    user = await auth_service.get_current_user(token)
+    user = await auth_service.get_current_active_user(token)
     return user

@@ -92,6 +92,16 @@ class AuthService:
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         return user
+    
+    async def get_current_active_user(self, token: str) -> UserDBSchema:
+        """
+        Get current active user.
+        """
+
+        current_user = await self.get_current_user(token)
+        if not current_user.is_active:
+            raise HTTPException(status_code=400, detail="Inactive user")
+        return current_user
 
     async def authenticate_user(
         self, email: str, password: str
