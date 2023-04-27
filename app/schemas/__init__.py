@@ -14,3 +14,9 @@ from app.schemas.user import (  # noqa: F401
     UserDBBaseSchema,
     UserDBSchema,
 )
+from app.schemas.auth import (  # noqa: F401
+    LoginSchema,
+    SignUpSchema,
+    TokenSchema,
+    AccessTokenSchema,
+)
