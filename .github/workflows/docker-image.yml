@@ -16,3 +16,12 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      env:
+        DB_HOST: mongodb://
+        DB_PORT: 27017
+        DB_NAME: test_db
+        DB_USER: root
+        DB_PASSWORD: password
+        JWT_SECRET_KEY: secret
+        ALGORITHM: HS256
+
