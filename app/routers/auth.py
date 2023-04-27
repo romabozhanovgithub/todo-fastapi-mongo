@@ -7,6 +7,8 @@ from app.services import AuthService
 from app.schemas import (
     AccessTokenSchema,
     UserResponseSchema,
+    InvalidCredentialsSchema,
+    UserAlreadyExistsSchema,
 )
 from app.core.dependencies import get_auth_service
 
@@ -18,6 +20,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     summary="Login",
     response_model=AccessTokenSchema,
     status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"model": InvalidCredentialsSchema}
+    },
 )
 async def login(
     login: OAuth2PasswordRequestForm = Depends(),
@@ -35,6 +40,7 @@ async def login(
     summary="Sign Up",
     response_model=UserResponseSchema,
     status_code=status.HTTP_201_CREATED,
+    responses={status.HTTP_409_CONFLICT: {"model": UserAlreadyExistsSchema}},
 )
 async def signup(
     data: SignUpSchema,

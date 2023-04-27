@@ -60,3 +60,17 @@ class AccessTokenSchema(BaseModel):
                 "token_type": "bearer",
             }
         }
+
+
+class InvalidCredentialsSchema(BaseModel):
+    detail: str = Field(..., example="Invalid credentials")
+
+    class Config:
+        schema_extra = {"example": {"detail": "Invalid credentials"}}
+
+
+class UserAlreadyExistsSchema(BaseModel):
+    detail: str = Field(..., example="User already exists")
+
+    class Config:
+        schema_extra = {"example": {"detail": "User already exists"}}

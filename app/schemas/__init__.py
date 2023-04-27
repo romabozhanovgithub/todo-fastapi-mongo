@@ -19,4 +19,6 @@ from app.schemas.auth import (  # noqa: F401
     SignUpSchema,
     TokenSchema,
     AccessTokenSchema,
+    InvalidCredentialsSchema,
+    UserAlreadyExistsSchema,
 )
