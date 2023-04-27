@@ -2,7 +2,6 @@ from app.schemas.helpers import PyObjectId
 from app.services.base import BaseService
 from app.core.exceptions import TaskNotFound
 from app.schemas import (
-    TaskRequestSchema,
     TaskResponseSchema,
     TaskListResponseSchema,
 )
@@ -35,10 +34,10 @@ class TaskService(BaseService):
         return TaskResponseSchema(**result)
 
     async def update_task_by_id_and_user(
-        self, task_id: str, task: TaskRequestSchema, user_id: str | PyObjectId
+        self, task_id: str, task: dict, user_id: str | PyObjectId
     ) -> TaskResponseSchema:
         result = await self.find_and_update_document_by_id(
-            task_id, task.dict(), filter={"user": user_id}
+            task_id, task, filter={"user": user_id}
         )
         return TaskResponseSchema(**result)
 

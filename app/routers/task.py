@@ -77,7 +77,7 @@ async def update_task(
     user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskResponseSchema:
     updated_task = await task_service.update_task_by_id_and_user(
-        task_id, task, user.id
+        task_id, task.dict(), user.id
     )
     return updated_task
 

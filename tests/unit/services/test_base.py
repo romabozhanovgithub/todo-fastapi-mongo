@@ -15,7 +15,9 @@ async def test_create_document(base_service: BaseService):
 async def test_find_document_by_id(base_service: BaseService):
     document = {"name": "test"}
     new_document = await base_service.create_document(document)
-    found_document = await base_service.find_document_by_id(str(new_document["_id"]))
+    found_document = await base_service.find_document_by_id(
+        str(new_document["_id"])
+    )
     assert found_document["name"] == document["name"]
     assert found_document["created_at"] is not None
 
@@ -44,7 +46,9 @@ async def test_find_document_by_id_with_filter(base_service: BaseService):
 
 
 @pytest.mark.asyncio
-async def test_find_document_by_id_with_filter_not_found(base_service: BaseService):
+async def test_find_document_by_id_with_filter_not_found(
+    base_service: BaseService,
+):
     document = {"name": "test"}
     new_document = await base_service.create_document(document)
     with pytest.raises(base_service.not_found_exception):
@@ -54,7 +58,9 @@ async def test_find_document_by_id_with_filter_not_found(base_service: BaseServi
 
 
 @pytest.mark.asyncio
-async def test_find_document_by_id_with_filter_invalid_id(base_service: BaseService):
+async def test_find_document_by_id_with_filter_invalid_id(
+    base_service: BaseService,
+):
     with pytest.raises(base_service.not_found_exception):
         await base_service.find_document_by_id(
             "invalid_id", {"name": "invalid"}
@@ -117,7 +123,9 @@ async def test_find_and_update_document_by_id(base_service: BaseService):
 
 
 @pytest.mark.asyncio
-async def test_find_and_update_document_by_id_not_found(base_service: BaseService):
+async def test_find_and_update_document_by_id_not_found(
+    base_service: BaseService,
+):
     with pytest.raises(base_service.not_found_exception):
         await base_service.find_and_update_document_by_id(
             "5f5b9c5e0f8f0b2c2f2d6f6f", {"name": "test2"}
@@ -136,6 +144,10 @@ async def test_find_and_delete_document_by_id(base_service: BaseService):
 
 
 @pytest.mark.asyncio
-async def test_find_and_delete_document_by_id_not_found(base_service: BaseService):
+async def test_find_and_delete_document_by_id_not_found(
+    base_service: BaseService,
+):
     with pytest.raises(base_service.not_found_exception):
-        await base_service.find_and_delete_document_by_id("5f5b9c5e0f8f0b2c2f2d6f6f")
+        await base_service.find_and_delete_document_by_id(
+            "5f5b9c5e0f8f0b2c2f2d6f6f"
+        )
