@@ -30,6 +30,7 @@ class TaskRequestSchema(TaskBaseSchema):
 
 class TaskDBSchema(TaskBaseSchema):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user: PyObjectId = Field(default_factory=PyObjectId, alias="user")
     created_at: datetime = Field(...)
 
 
@@ -41,6 +42,7 @@ class TaskResponseSchema(TaskDBSchema):
                 "title": "Task 1",
                 "description": "Task 1 description",
                 "status": False,
+                "user": "60c4b8b7e6a9d9f9f7f7f7f7",
                 "created_at": "2021-01-01 00:00:00",
             }
         }
@@ -58,6 +60,7 @@ class TaskListResponseSchema(BaseModel):
                         "title": "Task 1",
                         "description": "Task 1 description",
                         "status": False,
+                        "user": "60c4b8b7e6a9d9f9f7f7f7f7",
                         "created_at": "2021-01-01 00:00:00",
                     },
                     {
@@ -65,6 +68,7 @@ class TaskListResponseSchema(BaseModel):
                         "title": "Task 2",
                         "description": "Task 2 description",
                         "status": True,
+                        "user": "60c4b8b7e6a9d9f9f7f7f7f7",
                         "created_at": "2021-01-01 00:00:00",
                     },
                 ]
@@ -74,19 +78,25 @@ class TaskListResponseSchema(BaseModel):
 
 class TaskDeleteResponseSchema(BaseModel):
     detail: str = "Task deleted successfully"
-    deleted: bool = Field(...)
+    task: TaskResponseSchema
 
     class Config(TaskConfig):
         schema_extra = {
             "example": {
-                "detail": "Task deleted successfully",
-                "deleted": True,
+                "detail": "Task with id 60c4b8b7e6a9d9f9f7f7f7f7 has been deleted",  # noqa E501
+                "task": {
+                    "_id": "60c4b8b7e6a9d9f9f7f7f7f7",
+                    "title": "Task 1",
+                    "description": "Task 1 description",
+                    "status": False,
+                    "created_at": "2021-01-01 00:00:00",
+                },
             }
         }
 
 
 class TaskNotFoundResponseSchema(BaseModel):
-    detail: str = "Task not found"
+    detail: str
 
     class Config(TaskConfig):
         schema_extra = {

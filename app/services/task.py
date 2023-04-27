@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from app.services.base import BaseService
 from app.core.exceptions import TaskNotFound
 from app.schemas import (
@@ -11,32 +9,32 @@ from app.schemas import (
 
 class TaskService(BaseService):
     collection_name = "tasks"
-    not_found_error = TaskNotFound
+    not_found_exception = TaskNotFound
 
     async def get_tasks(self) -> TaskListResponseSchema:
-        tasks = await self.collection.find().to_list(length=100)
-        return tasks
+        tasks = await self.find_documents()
+        return TaskListResponseSchema(tasks=tasks)
+    
+    async def get_tasks_by_user(self, user_id: str) -> TaskListResponseSchema:
+        tasks = await self.find_documents({"user": user_id})
+        return TaskListResponseSchema(tasks=tasks)
 
-    async def get_task(self, task_id: str) -> TaskResponseSchema:
-        task = await self.collection.find_one({"_id": self._get_id(task_id)})
-        return task
+    async def get_task_by_id_and_user(self, task_id: str, user_id: str) -> TaskResponseSchema:
+        task = await self.find_document_by_id(task_id, filter={"user": user_id})
+        return TaskResponseSchema(**task)
 
-    async def create_task(self, task: TaskRequestSchema) -> TaskResponseSchema:
-        result = await self.collection.insert_one(
-            {**task.dict(), "created_at": datetime.utcnow()}
-        )
-        new_task = await self.get_task(result.inserted_id)
-        return new_task
+    async def create_task(self, task: dict) -> TaskResponseSchema:
+        result = await self.create_document(task)
+        return TaskResponseSchema(**result)
 
-    async def update_task(
-        self, task_id: str, task: TaskRequestSchema
+    async def update_task_by_id_and_user(
+        self, task_id: str, task: TaskRequestSchema, user_id: str
     ) -> TaskResponseSchema:
-        await self.collection.update_one(
-            {"_id": self._get_id(task_id)}, {"$set": task.dict()}
+        result = await self.find_and_update_document_by_id(
+            task_id, task.dict(), filter={"user": user_id}
         )
-        new_task = await self.get_task(task_id)
-        return new_task
+        return TaskResponseSchema(**result)
 
-    async def delete_task(self, task_id: str) -> bool:
-        await self.collection.delete_one({"_id": self._get_id(task_id)})
-        return True
+    async def delete_task_by_id_and_user(self, task_id: str, user_id: str) -> TaskResponseSchema:
+        task = await self.find_and_delete_document_by_id(task_id, filter={"user": user_id})
+        return TaskResponseSchema(**task)
