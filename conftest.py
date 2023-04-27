@@ -1,4 +1,3 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 import pytest
 from app.core.exceptions import BaseHTTPException
 from app.services.base import BaseService
@@ -17,5 +16,7 @@ def base_service(mongo_service):
         status_code = 404
         detail = "Not Found"
 
-    base_service = BaseService(mongo_service, "test_collection", NotFoundException)
+    base_service = BaseService(
+        mongo_service, "test_collection", NotFoundException
+    )
     return base_service

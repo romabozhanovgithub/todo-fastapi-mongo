@@ -12,11 +12,11 @@ class BaseService:
     not_found_exception: Type[BaseHTTPException]
 
     def __init__(
-            self,
-            mongo_service: MongoService,
-            collection_name: Optional[str] = None,
-            not_found_exception: Optional[Type[BaseHTTPException]] = None,
-        ) -> None:
+        self,
+        mongo_service: MongoService,
+        collection_name: Optional[str] = None,
+        not_found_exception: Optional[Type[BaseHTTPException]] = None,
+    ) -> None:
         if collection_name:
             self.collection_name = collection_name
         if not_found_exception:
