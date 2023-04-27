@@ -1,4 +1,4 @@
-DOCKER_COMPOSE_FILE=docker-compose-test.yml
+DOCKER_COMPOSE_FILE=docker-compose-tests.yml
 APP_FOLDER=app/
 
 test:
