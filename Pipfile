@@ -19,6 +19,7 @@ passlib = {extras = ["bcrypt"], version = "*"}
 python-multipart = "*"
 pytest-motor = "==0.1.3"
 pytest-asyncio = "*"
+pytest-env = "*"
 
 [dev-packages]
 

@@ -6,8 +6,8 @@ from app.services.mongo import MongoService
 
 
 @pytest.fixture
-def mongo_service(motor_client: AsyncIOMotorClient):
-    mongo_service = MongoService(client=motor_client, db_name="test_db")
+def mongo_service():
+    mongo_service = MongoService()
     return mongo_service
 
 
@@ -17,7 +17,5 @@ def base_service(mongo_service):
         status_code = 404
         detail = "Not Found"
 
-    base_service = BaseService(mongo_service)
-    base_service.collection_name = "test_collection"
-    base_service.not_found_exception = NotFoundException
+    base_service = BaseService(mongo_service, "test_collection", NotFoundException)
     return base_service
