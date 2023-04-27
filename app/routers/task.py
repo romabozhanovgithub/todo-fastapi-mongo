@@ -1,58 +1,88 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from app.services import TaskService
-from app.schemas import TaskRequestSchema, TaskResponseSchema, TaskListResponseSchema, TaskDeleteResponseSchema
-from app.core.exceptions import TaskNotFound
+from app.schemas import (
+    TaskRequestSchema,
+    TaskResponseSchema,
+    TaskListResponseSchema,
+    TaskDeleteResponseSchema,
+    TaskNotFoundResponseSchema,
+)
 from app.core.dependencies import get_task_service
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
-@router.get("/", response_model=TaskListResponseSchema)
+@router.get(
+    "/",
+    summary="List of tasks",
+    response_model=TaskListResponseSchema,
+    status_code=status.HTTP_200_OK,
+)
 async def get_tasks(
     task_service: TaskService = Depends(get_task_service),
 ) -> TaskListResponseSchema:
     tasks = await task_service.get_tasks()
-    return tasks
+    return TaskListResponseSchema(tasks=tasks)
 
 
-@router.get("/{task_id}", response_model=TaskResponseSchema)
+@router.get(
+    "/{task_id}",
+    summary="Get task by ID",
+    response_model=TaskResponseSchema,
+    status_code=status.HTTP_200_OK,
+    responses={404: {"model": TaskNotFoundResponseSchema}},
+)
 async def get_task(
     task_id: str, task_service: TaskService = Depends(get_task_service)
 ) -> TaskResponseSchema:
     task = await task_service.get_task(task_id)
-    if not task:
-        raise TaskNotFound(task_id)
     return task
 
 
-@router.post("/", response_model=TaskResponseSchema)
+@router.post(
+    "/",
+    summary="Create new task",
+    response_model=TaskResponseSchema,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_task(
-    task: TaskRequestSchema, task_service: TaskService = Depends(get_task_service)
+    task: TaskRequestSchema,
+    task_service: TaskService = Depends(get_task_service),
 ) -> TaskResponseSchema:
-    task = await task_service.create_task(task)
-    return task
+    new_task = await task_service.create_task(task)
+    return new_task
 
 
-@router.put("/{task_id}", response_model=TaskResponseSchema)
+@router.put(
+    "/{task_id}",
+    summary="Update task",
+    response_model=TaskResponseSchema,
+    status_code=status.HTTP_200_OK,
+    responses={404: {"model": TaskNotFoundResponseSchema}},
+)
 async def update_task(
     task_id: str,
     task: TaskRequestSchema,
     task_service: TaskService = Depends(get_task_service),
 ) -> TaskResponseSchema:
-    task = await task_service.update_task(task_id, task)
-    if not task:
-        raise TaskNotFound(task_id)
-    return task
+    updated_task = await task_service.update_task(task_id, task)
+    return updated_task
 
 
-@router.delete("/{task_id}", response_model=TaskDeleteResponseSchema)
+@router.delete(
+    "/{task_id}",
+    summary="Delete task",
+    response_model=TaskDeleteResponseSchema,
+    status_code=status.HTTP_200_OK,
+    responses={404: {"model": TaskNotFoundResponseSchema}},
+)
 async def delete_task(
-    task_id: str, task_service: TaskService = Depends(get_task_service)
+    task_id: str,
+    task_service: TaskService = Depends(get_task_service),
 ) -> TaskDeleteResponseSchema:
     deleted = await task_service.delete_task(task_id)
-    if not deleted:
-        raise TaskNotFound(task_id)
-    return {
-        "deleted": deleted,
-    }
+    return TaskDeleteResponseSchema(
+        message=f"Task with id {task_id} has been deleted",
+        deleted=deleted,
+    )
