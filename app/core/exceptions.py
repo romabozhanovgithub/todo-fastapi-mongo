@@ -18,3 +18,17 @@ class UserNotFound(BaseHTTPException):
         super().__init__(
             status_code=status_code, detail=f"User {user_id} not found"
         )
+
+
+class UserAlreadyExists(BaseHTTPException):
+    def __init__(self, status_code=400) -> None:
+        super().__init__(
+            status_code=status_code, detail=f"User already exists"
+        )
+
+
+class UserInvalidCredentials(BaseHTTPException):
+    def __init__(self, status_code=401) -> None:
+        super().__init__(
+            status_code=status_code, detail=f"Invalid credentials"
+        )

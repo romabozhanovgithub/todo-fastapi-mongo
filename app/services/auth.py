@@ -6,6 +6,7 @@ from fastapi import status
 from fastapi.exceptions import HTTPException
 
 from app.core import settings
+from app.core.exceptions import UserAlreadyExists, UserInvalidCredentials
 from app.services import UserService
 from app.schemas import UserResponseSchema, UserDBSchema
 
@@ -23,10 +24,7 @@ class AuthService:
         """
 
         if not pwd_context.verify(plain_password, hashed_password):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid credentials",
-            )
+            raise UserInvalidCredentials()
 
     def get_password_hash(self, password) -> str:
         """
@@ -86,13 +84,9 @@ class AuthService:
             payload = self.decode_token(token)
             email: Optional[str] = payload.get("sub")
             if email is None:
-                raise HTTPException(
-                    status_code=401, detail="Could not validate credentials"
-                )
+                raise UserInvalidCredentials()
         except JWTError:
-            raise HTTPException(
-                status_code=401, detail="Could not validate credentials"
-            )
+            raise UserInvalidCredentials()
         user = await self.user_service.get_user_by_email(email)
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
@@ -118,10 +112,7 @@ class AuthService:
         try:
             user = await self.user_service.get_user_by_email(email)
         except self.user_service.not_found_exception:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid credentials",
-            )
+            raise UserInvalidCredentials()
         self.verify_password(password, user.password)
         return UserResponseSchema(**user.dict())
 
@@ -134,9 +125,7 @@ class AuthService:
 
         try:
             await self.user_service.find_document_by_field("email", email)
-            raise HTTPException(
-                status_code=400, detail="Email already registered"
-            )
+            raise UserAlreadyExists()
         except self.user_service.not_found_exception:
             user = await self.user_service.create_user(
                 {

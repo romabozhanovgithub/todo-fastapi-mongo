@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from app.core.exceptions import UserAlreadyExists
 from app.schemas.auth import SignUpSchema
 
 from app.services import AuthService
@@ -42,8 +43,5 @@ async def signup(
 ) -> UserResponseSchema:
     user = await auth_service.sign_up_user(**data.dict())
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User already exists",
-        )
+        raise UserAlreadyExists()
     return user
