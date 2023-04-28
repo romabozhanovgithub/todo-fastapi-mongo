@@ -35,7 +35,9 @@ def base_service(mongo_service):
     )
     return base_service
 
+
 # TASKS
+
 
 @pytest.fixture(scope="session")
 def task_service(mongo_service):
@@ -63,7 +65,9 @@ def task_data_with_user():
     }
     return task
 
+
 # USERS
+
 
 @pytest.fixture(scope="session")
 def user_service(mongo_service):
@@ -82,19 +86,27 @@ def user_data():
 
 
 @pytest_asyncio.fixture(scope="session")
-async def user_in_db(auth_service: AuthService, user_service: UserService, user_data: dict):
+async def user_in_db(
+    auth_service: AuthService, user_service: UserService, user_data: dict
+):
     try:
         user = await user_service.get_user_by_email(user_data["email"])
     except user_service.not_found_exception:
-        user = await user_service.create_user({
-            **user_data,
-            "password": auth_service.get_password_hash(user_data["password"])
-        })
+        user = await user_service.create_user(
+            {
+                **user_data,
+                "password": auth_service.get_password_hash(
+                    user_data["password"]
+                ),
+            }
+        )
     return user
 
 
 @pytest_asyncio.fixture(scope="session")
-async def user_in_db_inactive(auth_service: AuthService, user_service: UserService):
+async def user_in_db_inactive(
+    auth_service: AuthService, user_service: UserService
+):
     user_data = {
         "full_name": "Test User2",
         "email": "test2@gmail.com",
@@ -105,15 +117,20 @@ async def user_in_db_inactive(auth_service: AuthService, user_service: UserServi
     except user_service.not_found_exception:
         user = await user_service.create_user(user_data)
         user = await user_service.update_user(
-            str(user.id), {
+            str(user.id),
+            {
                 **user.dict(),
                 "is_active": False,
-                "password": auth_service.get_password_hash(user_data["password"])
-            }
+                "password": auth_service.get_password_hash(
+                    user_data["password"]
+                ),
+            },
         )
     return user
 
+
 # AUTH
+
 
 @pytest.fixture(scope="session")
 def auth_service(user_service):

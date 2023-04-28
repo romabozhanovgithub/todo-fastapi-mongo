@@ -36,9 +36,7 @@ class UserService(BaseService):
     async def update_user(
         self, user_id: str, user: dict
     ) -> UserResponseSchema:
-        result = await self.find_and_update_document_by_id(
-            user_id, user
-        )
+        result = await self.find_and_update_document_by_id(user_id, user)
         return UserResponseSchema(**result)
 
     async def delete_user(self, user_id: str) -> UserResponseSchema:

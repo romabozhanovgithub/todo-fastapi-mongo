@@ -126,9 +126,7 @@ async def test_authenticate_user_invalid_credentials(
 
 
 @pytest.mark.asyncio
-async def test_authenticate_user_not_existing_user(
-    auth_service: AuthService
-):
+async def test_authenticate_user_not_existing_user(auth_service: AuthService):
     with pytest.raises(UserInvalidCredentials):
         await auth_service.authenticate_user("not_existing_user", "password")
 
@@ -146,11 +144,12 @@ async def test_sign_up_user(auth_service: AuthService):
 
 
 @pytest.mark.asyncio
-async def test_sign_up_user_existing_user(auth_service: AuthService, user_in_db: UserDBSchema):
+async def test_sign_up_user_existing_user(
+    auth_service: AuthService, user_in_db: UserDBSchema
+):
     with pytest.raises(UserAlreadyExists):
         await auth_service.sign_up_user(
             full_name=user_in_db.full_name,
             email=user_in_db.email,
             password="password",
         )
-
