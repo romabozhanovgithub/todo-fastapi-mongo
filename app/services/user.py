@@ -34,10 +34,10 @@ class UserService(BaseService):
         return UserResponseSchema(**result)
 
     async def update_user(
-        self, user_id: str, user: UserRequestSchema
+        self, user_id: str, user: dict
     ) -> UserResponseSchema:
         result = await self.find_and_update_document_by_id(
-            user_id, user.dict()
+            user_id, user
         )
         return UserResponseSchema(**result)
 
