@@ -1,5 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from app.core import settings
+from app.db.database import db
 
-client = AsyncIOMotorClient(settings.DB_URL)
+
+def get_client() -> AsyncIOMotorClient:
+    return db.client

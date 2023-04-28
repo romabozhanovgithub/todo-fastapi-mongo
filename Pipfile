@@ -20,6 +20,9 @@ python-multipart = "*"
 pytest-motor = "==0.1.3"
 pytest-asyncio = "*"
 pytest-env = "*"
+httpx = "*"
+anyio = "*"
+trio = "*"
 
 [dev-packages]
 

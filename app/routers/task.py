@@ -4,6 +4,7 @@ from app.services import TaskService
 from app.schemas import (
     TaskRequestSchema,
     TaskResponseSchema,
+    TaskUpdateSchema,
     TaskListResponseSchema,
     TaskDeleteResponseSchema,
     TaskNotFoundResponseSchema,
@@ -11,9 +12,7 @@ from app.schemas import (
 )
 from app.core.dependencies import get_request_user, get_task_service
 
-router = APIRouter(
-    prefix="/tasks", tags=["tasks"], dependencies=[Depends(get_request_user)]
-)
+router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.get(
@@ -57,9 +56,7 @@ async def create_task(
     task_service: TaskService = Depends(get_task_service),
     user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskResponseSchema:
-    new_task = await task_service.create_task(
-        {**task.dict(), "user_id": user.id}
-    )
+    new_task = await task_service.create_task({**task.dict(), "user": user.id})
     return new_task
 
 
@@ -72,12 +69,12 @@ async def create_task(
 )
 async def update_task(
     task_id: str,
-    task: TaskRequestSchema,
+    task: TaskUpdateSchema,
     task_service: TaskService = Depends(get_task_service),
     user: UserDBBaseSchema = Depends(get_request_user),
 ) -> TaskResponseSchema:
     updated_task = await task_service.update_task_by_id_and_user(
-        task_id, task.dict(), user.id
+        task_id, task.dict(exclude_none=True), user.id
     )
     return updated_task
 

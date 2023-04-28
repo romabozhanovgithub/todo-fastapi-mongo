@@ -9,6 +9,7 @@ from app.services.base import BaseService
 from app.services.mongo import MongoService
 from app.services.task import TaskService
 from app.services.user import UserService
+from app.db.utils import connect_to_mongo, close_mongo_connection
 
 
 @pytest.fixture(scope="session")
@@ -18,10 +19,28 @@ def event_loop():
     loop.close()
 
 
+@pytest.fixture
+def anyio_backend():
+    return "asyncio"
+
+
+# MONGO
+
+
+@pytest_asyncio.fixture(scope="session")
+async def mongo_client():
+    await connect_to_mongo()
+    yield
+    await close_mongo_connection()
+
+
 @pytest.fixture(scope="session")
-def mongo_service():
+def mongo_service(mongo_client):
     mongo_service = MongoService()
     return mongo_service
+
+
+# BASE
 
 
 @pytest.fixture(scope="session")
@@ -63,6 +82,19 @@ def task_data_with_user():
         "status": False,
         "user": ObjectId("60f1d1b7e13b9a1e9f1b1b1b"),
     }
+    return task
+
+
+@pytest_asyncio.fixture(scope="session")
+async def task_in_db(task_service: TaskService, task_data: dict, user_in_db):
+    try:
+        task = await task_service.find_document_by_field(
+            "title", task_data["title"]
+        )
+    except task_service.not_found_exception:
+        task = await task_service.create_task(
+            {**task_data, "user": user_in_db.id}
+        )
     return task
 
 
@@ -136,3 +168,15 @@ async def user_in_db_inactive(
 def auth_service(user_service):
     auth_service = AuthService(user_service)
     return auth_service
+
+
+@pytest_asyncio.fixture(scope="session")
+async def auth_token(auth_service: AuthService, user_in_db):
+    token = auth_service.create_access_token(user_in_db.email)
+    return token
+
+
+@pytest_asyncio.fixture(scope="session")
+async def auth_token_with_user_id(auth_service: AuthService, user_in_db):
+    token = auth_service.create_access_token(user_in_db.email)
+    return {"token": token, "user_id": str(user_in_db.id)}

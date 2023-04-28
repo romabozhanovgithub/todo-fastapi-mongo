@@ -5,7 +5,6 @@ from app.schemas.user import UserResponseSchema
 
 from app.services.auth import AuthService
 from app.core.exceptions import UserAlreadyExists, UserInvalidCredentials
-from app.services.user import UserService
 from app.schemas import UserDBSchema
 
 

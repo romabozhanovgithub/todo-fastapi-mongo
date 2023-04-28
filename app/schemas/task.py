@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
@@ -24,6 +25,23 @@ class TaskRequestSchema(TaskBaseSchema):
                 "title": "Task 1",
                 "description": "Task 1 description",
                 "status": False,
+            }
+        }
+
+
+class TaskUpdateSchema(BaseModel):
+    title: Optional[str]
+    description: Optional[str]
+    status: Optional[bool]
+
+    class Config(TaskConfig):
+        exclude_unset = True
+        exclude_none = True
+        schema_extra = {
+            "example": {
+                "title": "Task 1",
+                "description": "Task 1 description",
+                "status": True,
             }
         }
 

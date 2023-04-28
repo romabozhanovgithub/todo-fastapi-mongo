@@ -4,15 +4,17 @@ from motor.motor_asyncio import (
     AsyncIOMotorDatabase,
 )
 from app.core import settings
-from app.db import client
+from app.db.client import get_client
 
 
 class MongoService:
     def __init__(
         self,
-        client: AsyncIOMotorClient = client,
+        client: AsyncIOMotorClient = None,
         db_name: str = settings.DB_NAME,
     ) -> None:
+        if client is None:
+            client = get_client()
         self.client = client
         self.db_name = db_name
 

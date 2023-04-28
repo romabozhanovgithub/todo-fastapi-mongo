@@ -2,6 +2,7 @@ from app.schemas.helpers import PyObjectId  # noqa: F401
 from app.schemas.task import (  # noqa: F401
     TaskRequestSchema,
     TaskResponseSchema,
+    TaskUpdateSchema,
     TaskListResponseSchema,
     TaskDeleteResponseSchema,
     TaskNotFoundResponseSchema,

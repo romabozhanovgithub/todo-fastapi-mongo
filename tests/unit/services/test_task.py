@@ -7,7 +7,7 @@ from app.services.task import TaskService
 async def test_get_tasks_with_existing_task(
     task_service: TaskService, task_data_with_user: dict
 ):
-    new_task = await task_service.create_task(task_data_with_user)
+    await task_service.create_task(task_data_with_user)
     found_task = await task_service.get_tasks()
     assert len(found_task.tasks) > 0
 
