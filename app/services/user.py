@@ -1,7 +1,6 @@
 from app.core.exceptions import UserNotFound
 from app.services.base import BaseService
 from app.schemas import (
-    UserRequestSchema,
     UserResponseSchema,
     UserListResponseSchema,
     UserDBSchema,
