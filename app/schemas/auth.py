@@ -1,8 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 
 
 class LoginSchema(BaseModel):
-    email: str = Field(..., example="example@gmail.com")
+    email: EmailStr = Field(..., example="example@gmail.com")
     password: str = Field(..., example="password")
 
     class Config:

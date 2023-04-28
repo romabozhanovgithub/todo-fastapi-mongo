@@ -133,13 +133,13 @@ async def test_authenticate_user_not_existing_user(auth_service: AuthService):
 @pytest.mark.asyncio
 async def test_sign_up_user(auth_service: AuthService):
     user = await auth_service.sign_up_user(
-        full_name="Test User",
-        email="test_email@gmail.com",
+        full_name="Test Sign Up User",
+        email="test_sign_upemail@gmail.com",
         password="password",
     )
     assert user is not None
     assert isinstance(user, UserResponseSchema)
-    assert user.email == "test_email@gmail.com"
+    assert user.email == "test_sign_upemail@gmail.com"
 
 
 @pytest.mark.asyncio

@@ -21,7 +21,7 @@ class UserNotFound(BaseHTTPException):
 
 
 class UserAlreadyExists(BaseHTTPException):
-    def __init__(self, status_code=400) -> None:
+    def __init__(self, status_code=409) -> None:
         super().__init__(status_code=status_code, detail="User already exists")
 
 
