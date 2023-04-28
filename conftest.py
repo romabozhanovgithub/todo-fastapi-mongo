@@ -1,7 +1,10 @@
 import asyncio
 from bson import ObjectId
 import pytest
+import pytest_asyncio
+
 from app.core.exceptions import BaseHTTPException
+from app.services.auth import AuthService
 from app.services.base import BaseService
 from app.services.mongo import MongoService
 from app.services.task import TaskService
@@ -76,3 +79,43 @@ def user_data():
         "password": "test",
     }
     return user
+
+
+@pytest_asyncio.fixture(scope="session")
+async def user_in_db(auth_service: AuthService, user_service: UserService, user_data: dict):
+    try:
+        user = await user_service.get_user_by_email(user_data["email"])
+    except user_service.not_found_exception:
+        user = await user_service.create_user({
+            **user_data,
+            "password": auth_service.get_password_hash(user_data["password"])
+        })
+    return user
+
+
+@pytest_asyncio.fixture(scope="session")
+async def user_in_db_inactive(auth_service: AuthService, user_service: UserService):
+    user_data = {
+        "full_name": "Test User2",
+        "email": "test2@gmail.com",
+        "password": "test2",
+    }
+    try:
+        user = await user_service.get_user_by_email(user_data["email"])
+    except user_service.not_found_exception:
+        user = await user_service.create_user(user_data)
+        user = await user_service.update_user(
+            str(user.id), {
+                **user.dict(),
+                "is_active": False,
+                "password": auth_service.get_password_hash(user_data["password"])
+            }
+        )
+    return user
+
+# AUTH
+
+@pytest.fixture(scope="session")
+def auth_service(user_service):
+    auth_service = AuthService(user_service)
+    return auth_service

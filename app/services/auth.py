@@ -87,8 +87,6 @@ class AuthService:
         except JWTError:
             raise UserInvalidCredentials()
         user = await self.user_service.get_user_by_email(email)
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
         return user
 
     async def get_current_active_user(self, token: str) -> UserDBSchema:
