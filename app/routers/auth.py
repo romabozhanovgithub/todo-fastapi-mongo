@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.core.exceptions import UserAlreadyExists
 from app.schemas.auth import SignUpSchema
@@ -9,8 +9,11 @@ from app.schemas import (
     UserResponseSchema,
     InvalidCredentialsSchema,
     UserAlreadyExistsSchema,
+    CustomOAuth2PasswordRequestForm,
 )
 from app.core.dependencies import get_auth_service
+from app.core.exceptions import UserInvalidCredentials
+from app.core.utils import oauth
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -25,9 +28,15 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     },
 )
 async def login(
-    login: OAuth2PasswordRequestForm = Depends(),
+    login: CustomOAuth2PasswordRequestForm = Depends(),
     auth_service: AuthService = Depends(get_auth_service),
 ) -> AccessTokenSchema:
+    # this is a hack to allow google auth to work
+    if not login.password:
+        user = await auth_service.get_current_active_user(login.username)
+        return AccessTokenSchema(
+            access_token=login.username,
+        )
     user = await auth_service.authenticate_user(login.username, login.password)
     token = auth_service.create_access_token(user.email)
     return AccessTokenSchema(
@@ -50,3 +59,34 @@ async def signup(
     if not user:
         raise UserAlreadyExists()
     return user
+
+
+@router.get(
+    "/google",
+    summary="Google Auth",
+    response_model=AccessTokenSchema,
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"model": InvalidCredentialsSchema}
+    },
+)
+async def google_auth(
+    request: Request,
+    auth_service: AuthService = Depends(get_auth_service),
+) -> AccessTokenSchema:
+    user = await auth_service.google_authenticate_user(request)
+    token = auth_service.create_access_token(user.email)
+    return AccessTokenSchema(
+        access_token=token,
+    )
+
+
+@router.get(
+    "/google/login",
+    summary="Google Login",
+)
+async def google_login(
+    request: Request,
+) -> None:
+    redirect_uri = request.url_for("google_auth")
+    return await oauth.google.authorize_redirect(request, str(redirect_uri))

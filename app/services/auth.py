@@ -2,9 +2,12 @@ from datetime import datetime, timedelta
 from typing import Any, Optional, Union
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from fastapi import Request
 from fastapi.exceptions import HTTPException
+from authlib.integrations.starlette_client import OAuthError
 
 from app.core import settings
+from app.core.utils import oauth
 from app.core.exceptions import UserAlreadyExists, UserInvalidCredentials
 from app.services import UserService
 from app.schemas import UserResponseSchema, UserDBSchema
@@ -132,3 +135,25 @@ class AuthService:
                 }
             )
             return user
+        
+    async def google_authenticate_user(self, request: Request) -> UserResponseSchema:
+        """
+        Authenticate user via Google.
+        """
+
+        try:
+            access_token = await oauth.google.authorize_access_token(request)
+        except OAuthError as e:
+            raise UserInvalidCredentials()
+        user_data = access_token.get("userinfo")
+        try:
+            user = await self.user_service.get_user_by_email(user_data["email"])
+        except self.user_service.not_found_exception:
+            user = await self.user_service.create_user(
+                {
+                    "full_name": user_data["name"],
+                    "email": user_data["email"],
+                    "password": self.get_password_hash(user_data["sub"]),
+                }
+            )
+        return UserResponseSchema(**user.dict())
