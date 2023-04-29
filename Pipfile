@@ -23,6 +23,10 @@ httpx = "*"
 anyio = "*"
 trio = "*"
 pydantic = {extras = ["email"], version = "*"}
+google-auth = "*"
+itsdangerous = "*"
+authlib = "*"
+cffi = "*"
 
 [dev-packages]
 
