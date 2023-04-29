@@ -23,14 +23,14 @@ class UserService(BaseService):
         user = await self.find_document_by_field("email", email)
         return UserDBSchema(**user)
 
-    async def create_user(self, user: dict) -> UserResponseSchema:
+    async def create_user(self, user: dict) -> UserDBSchema:
         result = await self.create_document(
             {
                 **user,
                 "is_active": True,
             }
         )
-        return UserResponseSchema(**result)
+        return UserDBSchema(**result)
 
     async def update_user(
         self, user_id: str, user: dict

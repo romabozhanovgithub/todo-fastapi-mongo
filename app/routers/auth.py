@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Request, status
-from fastapi.security import OAuth2PasswordRequestForm
 from app.core.exceptions import UserAlreadyExists
 from app.schemas.auth import SignUpSchema
 
@@ -12,7 +11,6 @@ from app.schemas import (
     CustomOAuth2PasswordRequestForm,
 )
 from app.core.dependencies import get_auth_service
-from app.core.exceptions import UserInvalidCredentials
 from app.core.utils import oauth
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -33,7 +31,7 @@ async def login(
 ) -> AccessTokenSchema:
     # this is a hack to allow google auth to work
     if not login.password:
-        user = await auth_service.get_current_active_user(login.username)
+        await auth_service.get_current_active_user(login.username)
         return AccessTokenSchema(
             access_token=login.username,
         )
@@ -58,7 +56,7 @@ async def signup(
     user = await auth_service.sign_up_user(**data.dict())
     if not user:
         raise UserAlreadyExists()
-    return user
+    return UserResponseSchema(**user.dict())
 
 
 @router.get(

@@ -1,11 +1,13 @@
 import pytest
 
 from app.services.user import UserService
+from app.schemas import UserResponseSchema
 
 
 @pytest.mark.asyncio
 async def test_get_users(user_service: UserService, user_data: dict):
-    user = await user_service.create_user(user=user_data)
+    user_in_db = await user_service.create_user(user=user_data)
+    user = UserResponseSchema(**user_in_db.dict())
     users = await user_service.get_users()
     assert user in users.users
 

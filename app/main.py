@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse
@@ -12,9 +12,9 @@ app = FastAPI(title=settings.APP_TITLE)
 
 # GOOGLE
 oauth.register(
-    name='google',
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope': 'openid email profile'},
+    name="google",
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",  # noqa E501
+    client_kwargs={"scope": "openid email profile"},
 )
 
 # MIDDLEWARES
@@ -32,7 +32,7 @@ app.include_router(task_router)
 app.include_router(auth_router)
 
 
-@app.get('/')
+@app.get("/")
 async def root():
     return HTMLResponse('<body><a href="/auth/google/login">Log In</a></body>')
 

@@ -118,7 +118,7 @@ class AuthService:
 
     async def sign_up_user(
         self, full_name: str, email: str, password: str
-    ) -> UserResponseSchema:
+    ) -> UserDBSchema:
         """
         Sign up user.
         """
@@ -135,19 +135,23 @@ class AuthService:
                 }
             )
             return user
-        
-    async def google_authenticate_user(self, request: Request) -> UserResponseSchema:
+
+    async def google_authenticate_user(
+        self, request: Request
+    ) -> UserResponseSchema:
         """
         Authenticate user via Google.
         """
 
         try:
             access_token = await oauth.google.authorize_access_token(request)
-        except OAuthError as e:
+        except OAuthError:
             raise UserInvalidCredentials()
         user_data = access_token.get("userinfo")
         try:
-            user = await self.user_service.get_user_by_email(user_data["email"])
+            user = await self.user_service.get_user_by_email(
+                user_data["email"]
+            )
         except self.user_service.not_found_exception:
             user = await self.user_service.create_user(
                 {

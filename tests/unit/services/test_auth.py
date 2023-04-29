@@ -138,7 +138,7 @@ async def test_sign_up_user(auth_service: AuthService):
         password="password",
     )
     assert user is not None
-    assert isinstance(user, UserResponseSchema)
+    assert isinstance(user, UserDBSchema)
     assert user.email == "test_sign_upemail@gmail.com"
 
 
