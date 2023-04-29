@@ -22,4 +22,5 @@ from app.schemas.auth import (  # noqa: F401
     AccessTokenSchema,
     InvalidCredentialsSchema,
     UserAlreadyExistsSchema,
+    CustomOAuth2PasswordRequestForm,
 )

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
@@ -36,7 +37,7 @@ class UserDBBaseSchema(UserBaseSchema):
 
 
 class UserDBSchema(UserDBBaseSchema):
-    password: str = Field(...)
+    password: Optional[str]
 
 
 class UserResponseSchema(UserDBBaseSchema):

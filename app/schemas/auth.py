@@ -1,3 +1,6 @@
+from typing import Optional
+from fastapi import Form
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, Field, EmailStr
 
 
@@ -74,3 +77,21 @@ class UserAlreadyExistsSchema(BaseModel):
 
     class Config:
         schema_extra = {"example": {"detail": "User already exists"}}
+
+
+class CustomOAuth2PasswordRequestForm(OAuth2PasswordRequestForm):
+    def __init__(self,
+        grant_type: str = Form(default=None, regex="password"),
+        username: str = Form(),
+        password: str | None = Form(default=""),
+        scope: str = Form(default=""),
+        client_id: Optional[str] = Form(default=None),
+        client_secret: Optional[str] = Form(default=None)
+    ):
+        super().__init__(grant_type=grant_type, 
+            username=username, 
+            password=password,
+            scope=scope, 
+            client_id=client_id, 
+            client_secret=client_secret
+        )
