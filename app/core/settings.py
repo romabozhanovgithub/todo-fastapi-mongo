@@ -8,6 +8,7 @@ load_dotenv("./system_configs/.env")
 class Settings(BaseSettings):
     ENV: str = "dev"
     DEBUG: bool = True
+    SECRET_KEY: str
     APP_TITLE: str = "TODO API"
     # DATABASE
     DB_HOST: str
@@ -21,6 +22,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 31  # 31 days
+    # GOOGLE
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
 
     @validator("DB_URL", pre=True)
     def assemble_db_connection(
